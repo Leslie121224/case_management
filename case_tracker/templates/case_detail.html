@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>案件詳細資料</h2>
+  <p><strong>案件號碼：</strong> {{ case.case_number }}</p>
+  <p><strong>部門：</strong> {{ case.department }}</p>
+  <p><strong>電路圖：</strong> {{ case.circuit_diagram }}</p>
+  <p><strong>機型：</strong> {{ case.model_type }}</p>
+  <p><strong>業務案號：</strong> {{ case.business_case_number }}</p>
+  <p><strong>軟體版本：</strong> {{ case.software_version }}</p>
+  <p><strong>狀態：</strong> {{ case.status }}</p>
+
+  <h3>修改紀錄</h3>
+  <ul>
+    {% for record in history %}
+      <li>{{ record.modified_at }} - {{ record.modified_by }} 修改：{{ record.changes }}</li>
+    {% empty %}
+      <li>尚無修改紀錄</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'edit_case' case.id %}">編輯案件</a> |
+  <a href="{% url 'case_list' %}">返回案件列表</a>
+{% endblock %}

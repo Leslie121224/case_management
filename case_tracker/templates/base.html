@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}我的網站{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>案件管理系統</h1>
+        <nav>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">登出 ({{ user.username }})</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">登入</a> | <a href="{% url 'register' %}">註冊</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

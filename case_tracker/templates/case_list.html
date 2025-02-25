@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>案件列表</h2>
+
+  {% if user.is_authenticated %}
+    <a href="{% url 'add_case' %}">新增案件</a>
+  {% endif %}
+
+  <ul>
+    {% for case in cases %}
+      <li>
+        <a href="{% url 'case_detail' case.id %}"><strong>案件號碼：</strong> {{ case.case_number }}</a><br>
+        <strong>部門：</strong> {{ case.department }}<br>
+        <strong>狀態：</strong> {{ case.status }}<br>
+        {% if user.is_authenticated %}
+          <a href="{% url 'edit_case' case.id %}">編輯</a>
+        {% endif %}
+      </li>
+      <hr>
+    {% endfor %}
+  </ul>
+{% endblock %}

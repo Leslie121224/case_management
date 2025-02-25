@@ -1,0 +1,17 @@
+# 忽略 Python 的暫存檔案
+__pycache__/
+*.pyc
+*.pyo
+
+# 忽略 Django 產生的資料庫
+db.sqlite3
+
+# 忽略虛擬環境
+venv/
+
+# 忽略靜態與媒體檔案
+staticfiles/
+media/
+
+# 忽略環境變數檔案
+.env
