@@ -22,7 +22,8 @@ def register(request):
 @login_required
 def case_list(request):
     query = request.GET.get("q", "")  # 取得搜尋關鍵字
-    cases = Case.objects.all()
+    sort_order = request.GET.get("sort_order", "-created_at")  # 依案件建立日期排序，預設「最新優先」
+    cases = Case.objects.all().order_by(sort_order)  # 🔹 依照使用者選擇排序
 
     if query:
         cases = cases.filter(
@@ -35,7 +36,11 @@ def case_list(request):
             Q(status__icontains=query)
         )
 
-    return render(request, "case_list.html", {"cases": cases, "query": query})
+    return render(request, "case_list.html", {
+        "cases": cases, 
+        "query": query, 
+        "sort_order": sort_order  # 🔹 把 sort_order 傳回模板
+    })
     
 # 新增案件
 @login_required

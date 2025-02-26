@@ -8,7 +8,7 @@ class Case(models.Model):
     department = models.CharField(max_length=50)  # 所屬部門
     related_case_number = models.CharField(max_length=20, blank=True, null=True)  # 對應案號
     customer = models.CharField(max_length=100, blank=True, null=True)  # 客戶名稱
-    created_at = models.DateTimeField(auto_now_add=True)  # 建立時間
+    created_at = models.DateTimeField(auto_now_add=True)  # 案件建立時間
     circuit_diagram = models.CharField(max_length=50, blank=True, null=True)  # 電路圖編號
     model_type = models.CharField(max_length=50, blank=True, null=True)  # 機型
     business_case_number = models.CharField(max_length=50, blank=True, null=True)  # 業務案號
