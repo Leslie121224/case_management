@@ -4,6 +4,7 @@ from django.contrib.auth import login
 from .models import Case, CaseHistory
 from django.contrib.auth.decorators import login_required
 from .forms import CaseForm
+from django.db.models import Q  # 🔹 支援模糊搜尋
 
 # 註冊帳號
 def register(request):
@@ -20,9 +21,22 @@ def register(request):
 # 案件列表
 @login_required
 def case_list(request):
+    query = request.GET.get("q", "")  # 取得搜尋關鍵字
     cases = Case.objects.all()
-    return render(request, "case_list.html", {"cases": cases})
 
+    if query:
+        cases = cases.filter(
+            Q(case_number__icontains=query) |
+            Q(department__icontains=query) |
+            Q(circuit_diagram__icontains=query) |
+            Q(model_type__icontains=query) |
+            Q(business_case_number__icontains=query) |
+            Q(software_version__icontains=query) |
+            Q(status__icontains=query)
+        )
+
+    return render(request, "case_list.html", {"cases": cases, "query": query})
+    
 # 新增案件
 @login_required
 def add_case(request):
@@ -35,6 +49,7 @@ def add_case(request):
         form = CaseForm()
     return render(request, "add_case.html", {"form": form})
 
+# 編輯案件
 @login_required
 def edit_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
@@ -51,6 +66,7 @@ def edit_case(request, case_id):
     
     return render(request, "edit_case.html", {"form": form, "case": case})
     
+# 查看案件細節
 @login_required
 def case_detail(request, case_id):
     case = get_object_or_404(Case, id=case_id)
