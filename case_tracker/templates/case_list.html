@@ -1,39 +1,140 @@
 {% extends "base.html" %}
+{% load custom_filters %}
+
 
 {% block content %}
   <h2>案件列表</h2>
 
+  <!-- 搜尋與篩選表單 -->
   <form method="GET" action="{% url 'case_list' %}">
     <input type="text" name="q" value="{{ query }}" placeholder="輸入搜尋關鍵字">
-	
+    
     <label for="sort_order">排序方式：</label>
     <select name="sort_order" id="sort_order">
         <option value="-created_at" {% if sort_order == "-created_at" %}selected{% endif %}>最新優先</option>
         <option value="created_at" {% if sort_order == "created_at" %}selected{% endif %}>最舊優先</option>
-    </select>	
-	
+    </select>  
+
+    <label for="department">部門：</label>
+    <select name="department">
+        <option value="">全部</option>
+        {% for dept in all_departments %}
+            <option value="{{ dept }}" {% if department_filter == dept %}selected{% endif %}>{{ dept }}</option>
+        {% endfor %}
+    </select>
+    
+    <label for="status">狀態：</label>
+    <select name="status">
+        <option value="">全部</option>
+        {% for s in all_statuses %}
+            <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- 開始日期 -->
+    <label>開始日期：</label>
+    <select name="start_year">
+        <option value="">年</option>
+        {% for year in years %}
+            <option value="{{ year }}" {% if start_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+    </select>
+    <select name="start_month">
+        <option value="">月</option>
+        {% for month in months %}
+            <option value="{{ month }}" {% if start_month == month|stringformat:"s" %}selected{% endif %}>{{ month }}</option>
+        {% endfor %}
+    </select>
+    <select name="start_day">
+        <option value="">日</option>
+        {% for day in days %}
+            <option value="{{ day }}" {% if start_day == day|stringformat:"s" %}selected{% endif %}>{{ day }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- 結束日期 -->
+    <label>結束日期：</label>
+    <select name="end_year">
+        <option value="">年</option>
+        {% for year in years %}
+            <option value="{{ year }}" {% if end_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+    </select>
+    <select name="end_month">
+        <option value="">月</option>
+        {% for month in months %}
+            <option value="{{ month }}" {% if end_month == month|stringformat:"s" %}selected{% endif %}>{{ month }}</option>
+        {% endfor %}
+    </select>
+    <select name="end_day">
+        <option value="">日</option>
+        {% for day in days %}
+            <option value="{{ day }}" {% if end_day == day|stringformat:"s" %}selected{% endif %}>{{ day }}</option>
+        {% endfor %}
+    </select>
+
     <button type="submit">搜尋</button>
+
+    <a href="{% url 'case_list' %}" onclick="return clearFilters();">清除篩選</a>
   </form>
+
+  <script>
+    function clearFilters() {
+        window.location.href = "{% url 'case_list' %}";
+        return false;
+    }
+  </script>
+
+  <!-- 案件列表 -->
+  <table border="1">
+    <thead>
+        <tr>
+            <th>案件號碼</th>
+            <th>部門</th>
+            <th>電路圖</th>
+            <th>機型</th>
+            <th>客戶案號</th>
+            <th>軟體版本</th>
+            <th>狀態</th>
+            <th>搜尋匹配</th>
+            {% if user.is_authenticated %}<th>操作</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for case in cases %}
+        <tr>
+            <td><a href="{% url 'case_detail' case.id %}">{{ case.case_number }}</a></td>
+            <td>{{ case.department }}</td>
+            <td>{{ case.circuit_diagram }}</td>
+            <td>{{ case.model_type }}</td>
+            <td>{{ case.business_case_number }}</td>
+            <td>{{ case.software_version }}</td>
+            <td>{{ case.status }}</td>
+            <td>
+				{% with search_results|get_item:case.id as match_reasons %}
+					{% if match_reasons %}
+						{% for reason in match_reasons %}
+							<div>{{ reason|safe }}</div>  <!-- 🔹 `|safe` 讓 HTML 標籤生效 -->
+						{% endfor %}
+					{% else %}
+						-
+					{% endif %}
+				{% endwith %}
+			</td>
+
+            {% if user.is_authenticated %}
+            <td><a href="{% url 'edit_case' case.id %}">編輯</a></td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="9">沒有符合條件的案件</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
 
   {% if user.is_authenticated %}
     <a href="{% url 'add_case' %}">新增案件</a>
   {% endif %}
-
-  <ul>
-    {% for case in cases %}
-      <li>
-        <a href="{% url 'case_detail' case.id %}"><strong>案件號碼：</strong> {{ case.case_number }}</a><br>
-        <strong>部門：</strong> {{ case.department }}<br>
-        <strong>狀態：</strong> {{ case.status }}<br>
-		<strong>建立日期：</strong> {{ case.created_at|date:"Y-m-d H:i" }}  <!-- 🔹 顯示日期 -->
-        <br>
-        {% if user.is_authenticated %}
-          <a href="{% url 'edit_case' case.id %}">編輯</a>
-        {% endif %}
-      </li>
-      <hr>
-	{% empty %}
-      <p>沒有符合條件的案件</p>
-    {% endfor %}
-  </ul>
 {% endblock %}
