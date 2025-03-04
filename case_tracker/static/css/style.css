@@ -1,0 +1,16 @@
+form{
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px; /* 🔹 增加內距，讓表格更舒適 */
+    border: 1px solid black; /* 🔹 加邊框讓格子清晰 */
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2; /* 🔹 標題行顏色 */
+}
